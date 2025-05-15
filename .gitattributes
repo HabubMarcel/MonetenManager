@@ -1,2 +1,9 @@
 /mvnw text eol=lf
-*.cmd text eol=crlf
+# Einheitliches Zeilenende
+* text=auto
+
+# Für Java-Projekte sinnvoll:
+*.java text eol=lf
+*.xml  text eol=lf
+*.sh   text eol=lf
+*.cmd  text eol=crlf
