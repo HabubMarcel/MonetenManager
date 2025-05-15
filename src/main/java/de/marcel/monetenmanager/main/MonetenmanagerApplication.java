@@ -1,0 +1,147 @@
+package de.marcel.monetenmanager.main;
+
+import java.util.Scanner;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import de.marcel.monetenmanager.application.BudgetService;
+import de.marcel.monetenmanager.application.CategoryService;
+import de.marcel.monetenmanager.application.MonthlyOverviewService;
+import de.marcel.monetenmanager.application.TransactionService;
+import de.marcel.monetenmanager.application.UserLoginService;
+import de.marcel.monetenmanager.application.UserRegistrationService;
+import de.marcel.monetenmanager.cli.BudgetCLIHandler;
+import de.marcel.monetenmanager.cli.CategoryCLIHandler;
+import de.marcel.monetenmanager.cli.OverviewCLIHandler;
+import de.marcel.monetenmanager.cli.TransactionCLIHandler;
+import de.marcel.monetenmanager.cli.UserCLIHandler;
+import de.marcel.monetenmanager.domain.User;
+import de.marcel.monetenmanager.infrastructure.BudgetJpaRepository;
+import de.marcel.monetenmanager.infrastructure.CategoryJpaRepository;
+import de.marcel.monetenmanager.infrastructure.DatabaseBudgetRepository;
+import de.marcel.monetenmanager.infrastructure.DatabaseCategoryRepository;
+import de.marcel.monetenmanager.infrastructure.DatabaseTransactionRepository;
+import de.marcel.monetenmanager.infrastructure.DatabaseUserRepository;
+import de.marcel.monetenmanager.infrastructure.TransactionJpaRepository;
+import de.marcel.monetenmanager.infrastructure.UserJpaRepository;
+
+@SpringBootApplication
+@EnableJpaRepositories(basePackages = "de.marcel.monetenmanager.infrastructure")
+@EntityScan(basePackages = "de.marcel.monetenmanager.infrastructure")
+@ComponentScan(basePackages = "de.marcel.monetenmanager")
+public class MonetenmanagerApplication implements CommandLineRunner {
+
+    private final UserJpaRepository userJpaRepository;
+private final TransactionJpaRepository transactionJpaRepository;
+private final CategoryJpaRepository categoryJpaRepository;
+private final BudgetJpaRepository budgetJpaRepository;
+
+public MonetenmanagerApplication(UserJpaRepository userJpaRepository,
+                                 TransactionJpaRepository transactionJpaRepository,
+                                 CategoryJpaRepository categoryJpaRepository,
+                                 BudgetJpaRepository budgetJpaRepository) {
+    this.userJpaRepository = userJpaRepository;
+    this.transactionJpaRepository = transactionJpaRepository;
+    this.categoryJpaRepository = categoryJpaRepository;
+    this.budgetJpaRepository = budgetJpaRepository;
+}
+
+    public static void main(String[] args) {
+        SpringApplication.run(MonetenmanagerApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        Scanner scanner = new Scanner(System.in);
+
+        var userRepository = new DatabaseUserRepository(userJpaRepository);
+        var registrationService = new UserRegistrationService(userRepository);
+        var loginService = new UserLoginService(userRepository);
+        var userCLIHandler = new UserCLIHandler(registrationService, loginService, scanner);
+
+        var transactionRepository = new DatabaseTransactionRepository(transactionJpaRepository);
+        var transactionService = new TransactionService(transactionRepository);
+        var transactionCLIHandler = new TransactionCLIHandler(transactionService, scanner);
+
+        var categoryRepository = new DatabaseCategoryRepository(categoryJpaRepository);
+        var categoryService = new CategoryService(categoryRepository);
+        var categoryCLIHandler = new CategoryCLIHandler(categoryService, scanner);
+
+        var budgetRepository = new DatabaseBudgetRepository(budgetJpaRepository);
+        var budgetService = new BudgetService(budgetRepository);
+        var budgetCLIHandler = new BudgetCLIHandler(budgetService, categoryService, scanner);
+
+        var overviewService = new MonthlyOverviewService(transactionRepository, categoryRepository, budgetRepository);
+        var overviewCLIHandler = new OverviewCLIHandler(overviewService, scanner);
+
+        User currentUser = null;
+
+        while (true) {
+            System.out.println("\n==== MonetenManager ====");
+            System.out.println("[1] Benutzer registrieren");
+            System.out.println("[2] Einloggen");
+            if (currentUser != null) {
+                System.out.println("[3] Transaktion hinzufügen");
+                System.out.println("[4] Transaktionen anzeigen");
+                System.out.println("[5] Kategorie erstellen");
+                System.out.println("[6] Kategorien anzeigen");
+                System.out.println("[7] Budget erstellen");
+                System.out.println("[8] Budgets anzeigen");
+                System.out.println("[9] Monatsübersicht anzeigen");
+}
+            System.out.println("[0] Beenden");
+            System.out.print("Auswahl: ");
+            String input = scanner.nextLine();
+
+            switch (input) {
+                case "1" -> userCLIHandler.handleRegistration();
+                case "2" -> {
+                    currentUser = userCLIHandler.handleLogin();
+                    if (currentUser != null) {
+                        System.out.println("➡️ Eingeloggt als " + currentUser.getName());
+                    }
+                }
+                case "3" -> {
+                    if (currentUser != null)
+                        transactionCLIHandler.handleAddTransaction(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
+                }
+                case "4" -> {
+                    if (currentUser != null)
+                        transactionCLIHandler.handleListTransactions(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
+                }
+                case "5" -> {
+                    if (currentUser != null) 
+                        categoryCLIHandler.handleCreateCategory(currentUser.getId());
+                }
+                case "6" -> {
+                    if (currentUser != null) 
+                        categoryCLIHandler.handleListCategories(currentUser.getId());
+                }
+                case "7" -> {
+                    if (currentUser != null) 
+                        budgetCLIHandler.handleCreateBudget(currentUser.getId());
+                }
+                case "8" -> {
+                    if (currentUser != null) 
+                        budgetCLIHandler.handleListBudgets(currentUser.getId());
+                }
+                case "9" -> {
+                if (currentUser != null) 
+                    overviewCLIHandler.handleOverview(currentUser.getId());
+                }
+                case "0" -> {
+                    System.out.println("Bis bald!");
+                    return;
+                }
+                default -> System.out.println("Ungültige Auswahl.");
+            }
+        }
+    }
+}
