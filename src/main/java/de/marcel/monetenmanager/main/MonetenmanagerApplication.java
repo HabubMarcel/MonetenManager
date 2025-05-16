@@ -9,26 +9,26 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import de.marcel.monetenmanager.application.BudgetService;
-import de.marcel.monetenmanager.application.CategoryService;
-import de.marcel.monetenmanager.application.MonthlyOverviewService;
-import de.marcel.monetenmanager.application.TransactionService;
-import de.marcel.monetenmanager.application.UserLoginService;
-import de.marcel.monetenmanager.application.UserRegistrationService;
-import de.marcel.monetenmanager.cli.BudgetCLIHandler;
-import de.marcel.monetenmanager.cli.CategoryCLIHandler;
-import de.marcel.monetenmanager.cli.OverviewCLIHandler;
-import de.marcel.monetenmanager.cli.TransactionCLIHandler;
-import de.marcel.monetenmanager.cli.UserCLIHandler;
-import de.marcel.monetenmanager.domain.User;
-import de.marcel.monetenmanager.infrastructure.BudgetJpaRepository;
-import de.marcel.monetenmanager.infrastructure.CategoryJpaRepository;
-import de.marcel.monetenmanager.infrastructure.DatabaseBudgetRepository;
-import de.marcel.monetenmanager.infrastructure.DatabaseCategoryRepository;
-import de.marcel.monetenmanager.infrastructure.DatabaseTransactionRepository;
-import de.marcel.monetenmanager.infrastructure.DatabaseUserRepository;
-import de.marcel.monetenmanager.infrastructure.TransactionJpaRepository;
-import de.marcel.monetenmanager.infrastructure.UserJpaRepository;
+import de.marcel.monetenmanager.application.budget.BudgetService;
+import de.marcel.monetenmanager.application.category.CategoryService;
+import de.marcel.monetenmanager.application.transaction.TransactionService;
+import de.marcel.monetenmanager.application.user.MonthlyOverviewService;
+import de.marcel.monetenmanager.application.user.UserLoginService;
+import de.marcel.monetenmanager.application.user.UserRegistrationService;
+import de.marcel.monetenmanager.cli.budget.BudgetCLIHandler;
+import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
+import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
+import de.marcel.monetenmanager.cli.user.OverviewCLIHandler;
+import de.marcel.monetenmanager.cli.user.UserCLIHandler;
+import de.marcel.monetenmanager.domain.user.User;
+import de.marcel.monetenmanager.infrastructure.budget.BudgetJpaRepository;
+import de.marcel.monetenmanager.infrastructure.budget.DatabaseBudgetRepository;
+import de.marcel.monetenmanager.infrastructure.category.CategoryJpaRepository;
+import de.marcel.monetenmanager.infrastructure.category.DatabaseCategoryRepository;
+import de.marcel.monetenmanager.infrastructure.transaction.DatabaseTransactionRepository;
+import de.marcel.monetenmanager.infrastructure.transaction.TransactionJpaRepository;
+import de.marcel.monetenmanager.infrastructure.user.DatabaseUserRepository;
+import de.marcel.monetenmanager.infrastructure.user.UserJpaRepository;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "de.marcel.monetenmanager.infrastructure")
