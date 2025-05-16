@@ -30,7 +30,7 @@ public class TransactionCLIHandler {
             System.out.print("Typ (EINNAHME oder AUSGABE): ");
             TransactionType type = TransactionType.valueOf(scanner.nextLine().toUpperCase());
 
-            transactionService.addTransaction(userId, category, amount, type);
+            transactionService.createTransaction(userId, category, amount, type);
             System.out.println("✅ Transaktion gespeichert.");
 
         } catch (Exception e) {

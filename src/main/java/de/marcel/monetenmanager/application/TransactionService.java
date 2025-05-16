@@ -17,7 +17,7 @@ public class TransactionService {
         this.repository = repository;
     }
 
-    public void addTransaction(UUID userId, String category, BigDecimal amount, TransactionType type) {
+    public void createTransaction(UUID userId, String category, BigDecimal amount, TransactionType type) {
         Transaction transaction = new Transaction(
                 UUID.randomUUID(),
                 userId,
