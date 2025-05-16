@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.marcel.monetenmanager.application.budget.BudgetService;
 import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.domain.budget.Budget;
@@ -16,6 +19,7 @@ public class BudgetCLIHandler {
     private final CategoryService categoryService;
     private final BudgetService service;
     private final Scanner scanner;
+    private static final Logger log = LoggerFactory.getLogger(BudgetCLIHandler.class);
 
 public BudgetCLIHandler(BudgetService service, CategoryService categoryService, Scanner scanner) {
     this.service = service;
@@ -59,15 +63,19 @@ UUID categoryId = categories.get(0).getId();
             LocalDate endDate = LocalDate.parse(scanner.nextLine());
 
             service.createBudget(userId, categoryId, name, amount, startDate, endDate);
+            log.info("Budget gespeichert: Name={}, Betrag={}, Zeitraum={} bis {}, Kategorie-ID={}",
+            name, amount, startDate, endDate, categoryId);
             System.out.println("✅ Budget gespeichert.");
 
         } catch (Exception e) {
-            System.out.println("❌ Fehler: " + e.getMessage());
+            log.error("❌ Fehler beim Erstellen des Budgets", e);
+            System.out.println("❌ Budget konnte nicht gespeichert werden.");
         }
     }
 
     public void handleListBudgets(UUID userId) {
         List<Budget> budgets = service.getBudgetsForUser(userId);
+        log.info("Gefundene Budgets für userId={}: {}", userId, budgets.size());
 
         if (budgets.isEmpty()) {
             System.out.println("ℹ️ Noch keine Budgets vorhanden.");

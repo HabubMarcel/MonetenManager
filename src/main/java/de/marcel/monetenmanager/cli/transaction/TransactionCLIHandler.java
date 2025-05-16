@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.marcel.monetenmanager.application.transaction.TransactionService;
 import de.marcel.monetenmanager.domain.transaction.Transaction;
 import de.marcel.monetenmanager.domain.transaction.TransactionType;
@@ -13,6 +16,7 @@ public class TransactionCLIHandler {
 
     private final TransactionService transactionService;
     private final Scanner scanner;
+    private static final Logger log = LoggerFactory.getLogger(TransactionCLIHandler.class);
 
     public TransactionCLIHandler(TransactionService transactionService, Scanner scanner) {
         this.transactionService = transactionService;
@@ -31,10 +35,12 @@ public class TransactionCLIHandler {
             TransactionType type = TransactionType.valueOf(scanner.nextLine().toUpperCase());
 
             transactionService.createTransaction(userId, category, amount, type);
+            log.info("Transaktion gespeichert: Kategorie={}, Betrag={}, Typ={}", category, amount, type);
             System.out.println("✅ Transaktion gespeichert.");
 
         } catch (Exception e) {
-            System.out.println("❌ Fehler beim Hinzufügen: " + e.getMessage());
+            log.error("❌ Fehler beim Hinzufügen der Transaktion", e);
+            System.out.println("❌ Transaktion konnte nicht gespeichert werden.");
         }
     }
 

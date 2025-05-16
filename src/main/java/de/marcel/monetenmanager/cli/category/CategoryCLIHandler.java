@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.domain.category.Category;
 import de.marcel.monetenmanager.domain.category.CategoryType;
@@ -12,6 +15,7 @@ public class CategoryCLIHandler {
 
     private final CategoryService service;
     private final Scanner scanner;
+    private static final Logger log = LoggerFactory.getLogger(CategoryCLIHandler.class);
 
     public CategoryCLIHandler(CategoryService service, Scanner scanner) {
         this.service = service;
@@ -30,10 +34,12 @@ public class CategoryCLIHandler {
             String color = scanner.nextLine();
 
             service.createCategory(userId, name, type, color);
+            log.info("Neue Kategorie erstellt: Name={}, Typ={}, Farbe={}", name, type, color);
             System.out.println("✅ Kategorie gespeichert.");
 
         } catch (Exception e) {
-            System.out.println("❌ Fehler: " + e.getMessage());
+            log.error("❌ Fehler beim Erstellen der Kategorie", e);
+            System.out.println("❌ Kategorie konnte nicht erstellt werden.");
         }
     }
 
