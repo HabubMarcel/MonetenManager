@@ -7,9 +7,9 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.application.user.UserLoginService;
 import de.marcel.monetenmanager.application.user.UserRegistrationService;
-import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
 import de.marcel.monetenmanager.domain.category.CategoryColor;
 import de.marcel.monetenmanager.domain.category.CategoryName;
@@ -79,22 +79,37 @@ public class UserCLIHandler {
     }
 
     public User handleLogin() {
-        System.out.print("E-Mail: ");
-        String email = scanner.nextLine();
+        try {
+            System.out.print("E-Mail: ");
+            String emailInput = scanner.nextLine();
 
-        String password = promptPassword();
+            System.out.print("Passwort: ");
+            String password = scanner.nextLine();
 
-        return loginService.login(email, password)
-                .map(user -> {
-                    System.out.println("✅ Login erfolgreich. Willkommen, " + user.getName() + "!");
-                    handleFirstTimeSetup(user.getId());
-                    return user;
-                })
-                .orElseGet(() -> {
-                    System.out.println("❌ Login fehlgeschlagen.");
-                    return null;
-                });
+            return loginService.login(emailInput, password)
+                    .map(user -> {
+                        log.info("Login erfolgreich für Benutzer: {}", user.getEmail());
+                        System.out.println("✅ Login erfolgreich. Willkommen, " + user.getName() + "!");
+                        handleFirstTimeSetup(user.getId());
+                        return user;
+                    })
+                    .orElseGet(() -> {
+                        log.warn("Login fehlgeschlagen für E-Mail: {}", emailInput);
+                        System.out.println("❌ Login fehlgeschlagen.");
+                        return null;
+                    });
+
+        } catch (IllegalArgumentException ex) {
+            log.error("Ungültige Eingabe beim Login: {}", ex.getMessage());
+            System.out.println("❌ Ungültige Eingaben: " + ex.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.error("Technischer Fehler beim Login", e);
+            System.out.println("❌ Ein unerwarteter Fehler ist aufgetreten.");
+            return null;
+        }
     }
+
 
     private void handleFirstTimeSetup(UUID userId) {
         if (categoryService.getCategoriesForUser(userId).isEmpty()) {

@@ -1,15 +1,17 @@
 package de.marcel.monetenmanager.application.transaction;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.stereotype.Component;
 
 import de.marcel.monetenmanager.domain.shared.Amount;
 import de.marcel.monetenmanager.domain.transaction.Transaction;
 import de.marcel.monetenmanager.domain.transaction.TransactionRepository;
 import de.marcel.monetenmanager.domain.transaction.TransactionType;
 
+@Component
 public class TransactionService {
 
     private final TransactionRepository repository;

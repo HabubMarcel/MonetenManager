@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Repository;
+
 import de.marcel.monetenmanager.domain.shared.Amount;
 import de.marcel.monetenmanager.domain.transaction.Transaction;
 import de.marcel.monetenmanager.domain.transaction.TransactionRepository;
 import de.marcel.monetenmanager.domain.transaction.TransactionType;
 
+@Repository
 public class DatabaseTransactionRepository implements TransactionRepository {
 
     private final TransactionJpaRepository jpaRepository;
