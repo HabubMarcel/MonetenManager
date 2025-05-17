@@ -51,7 +51,7 @@ public class MonthlyOverviewServiceTest {
 
         when(transactionRepository.findByUserId(userId)).thenReturn(List.of(t1, t2));
         when(categoryRepository.findByUserId(userId)).thenReturn(List.of(
-            new Category(UUID.randomUUID(), userId, "Essen", CategoryType.AUSGABE, "rot")
+            new Category(UUID.randomUUID(), userId, "Essen", CategoryType.AUSGABE, "rot", false)  // ⬅️ angepasst
         ));
 
         List<MonthlyOverviewService.OverviewEntry> overview = overviewService.getMonthlyOverview(userId, YearMonth.of(2025, 5));

@@ -2,6 +2,7 @@ package de.marcel.monetenmanager.cli.budget;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -16,66 +17,93 @@ import de.marcel.monetenmanager.domain.category.Category;
 
 public class BudgetCLIHandler {
 
-    private final CategoryService categoryService;
-    private final BudgetService service;
-    private final Scanner scanner;
     private static final Logger log = LoggerFactory.getLogger(BudgetCLIHandler.class);
 
-public BudgetCLIHandler(BudgetService service, CategoryService categoryService, Scanner scanner) {
-    this.service = service;
-    this.categoryService = categoryService;
-    this.scanner = scanner;
-}
+    private final BudgetService service;
+    private final CategoryService categoryService;
+    private final Scanner scanner;
+
+    public BudgetCLIHandler(BudgetService service, CategoryService categoryService, Scanner scanner) {
+        this.service = service;
+        this.categoryService = categoryService;
+        this.scanner = scanner;
+    }
 
     public void handleCreateBudget(UUID userId) {
         try {
+            List<Category> categories = categoryService.getCategoriesForUser(userId);
+
+            if (categories.isEmpty()) {
+                System.out.println("❌ Keine Kategorien vorhanden. Bitte zuerst eine Kategorie erstellen.");
+                return;
+            }
+
+            System.out.println("📂 Verfügbare Kategorien:");
+            for (Category c : categories) {
+                System.out.printf("→ %s (%s)%s\n",
+                        c.getName(),
+                        c.getType(),
+                        c.isSavings() ? " [💰 Sparziel]" : ""
+                );
+            }
+            System.out.println("⚠️ Nutze eindeutige Namen, um Mehrdeutigkeiten zu vermeiden.");
+
             System.out.print("Name des Budgets: ");
             String name = scanner.nextLine();
 
             System.out.print("Kategorie-Name: ");
             String categoryName = scanner.nextLine();
 
-            List<Category> categories = categoryService.getCategoriesForUser(userId).stream()
-            .filter(c -> c.getName().equalsIgnoreCase(categoryName))
-            .toList();
+            List<Category> matching = categories.stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(categoryName))
+                    .toList();
 
-            if (categories.isEmpty()) {
-            System.out.println("❌ Keine Kategorie mit diesem Namen gefunden.");
-            return;
+            if (matching.isEmpty()) {
+                System.out.println("❌ Keine passende Kategorie gefunden.");
+                return;
             }
-            if (categories.size() > 1) {
-            System.out.println("⚠️ Mehrere Kategorien mit dem Namen gefunden. Bitte ID verwenden.");
-            for (Category c : categories) {
-            System.out.printf("→ [%s] %s (%s, %s)\n", c.getId(), c.getName(), c.getType(), c.getColor());
-        }
-    return;
-}
+            if (matching.size() > 1) {
+                System.out.println("⚠️ Mehrere Kategorien mit diesem Namen gefunden. Bitte ID verwenden.");
+                matching.forEach(c ->
+                        System.out.printf("→ [%s] %s (%s, %s)%s\n",
+                                c.getId(), c.getName(), c.getType(), c.getColor(),
+                                c.isSavings() ? " [💰 Sparziel]" : "")
+                );
+                return;
+            }
 
-UUID categoryId = categories.get(0).getId();
+            UUID categoryId = matching.get(0).getId();
 
             System.out.print("Betrag (z. B. 100.00): ");
             BigDecimal amount = new BigDecimal(scanner.nextLine());
 
-            System.out.print("Startdatum (YYYY-MM-DD): ");
-            LocalDate startDate = LocalDate.parse(scanner.nextLine());
-
-            System.out.print("Enddatum (YYYY-MM-DD): ");
-            LocalDate endDate = LocalDate.parse(scanner.nextLine());
+            LocalDate startDate = readValidDate("Startdatum (YYYY-MM-DD): ");
+            LocalDate endDate = readValidDate("Enddatum (YYYY-MM-DD): ");
 
             service.createBudget(userId, categoryId, name, amount, startDate, endDate);
-            log.info("Budget gespeichert: Name={}, Betrag={}, Zeitraum={} bis {}, Kategorie-ID={}",
-            name, amount, startDate, endDate, categoryId);
             System.out.println("✅ Budget gespeichert.");
+            log.info("Budget für Benutzer {} erstellt: {}", userId, name);
 
         } catch (Exception e) {
-            log.error("❌ Fehler beim Erstellen des Budgets", e);
-            System.out.println("❌ Budget konnte nicht gespeichert werden.");
+            System.out.println("❌ Fehler: " + e.getMessage());
+            log.error("Fehler beim Erstellen eines Budgets", e);
+        }
+    }
+
+    private LocalDate readValidDate(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine();
+            try {
+                return LocalDate.parse(input);
+            } catch (DateTimeParseException e) {
+                System.out.println("❌ Ungültiges Datum. Bitte im Format YYYY-MM-DD eingeben.");
+            }
         }
     }
 
     public void handleListBudgets(UUID userId) {
         List<Budget> budgets = service.getBudgetsForUser(userId);
-        log.info("Gefundene Budgets für userId={}: {}", userId, budgets.size());
 
         if (budgets.isEmpty()) {
             System.out.println("ℹ️ Noch keine Budgets vorhanden.");
@@ -83,7 +111,8 @@ UUID categoryId = categories.get(0).getId();
             System.out.println("📊 Budgets:");
             for (Budget b : budgets) {
                 System.out.printf("[%s] %s: %.2f € (%s bis %s, Kategorie-ID: %s)\n",
-                        b.getId(), b.getName(), b.getAmount(), b.getStartDate(), b.getEndDate(), b.getCategoryId());
+                        b.getId(), b.getName(), b.getAmount(),
+                        b.getStartDate(), b.getEndDate(), b.getCategoryId());
             }
         }
     }

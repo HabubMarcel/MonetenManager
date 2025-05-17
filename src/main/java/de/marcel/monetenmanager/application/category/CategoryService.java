@@ -15,19 +15,24 @@ public class CategoryService {
         this.repository = repository;
     }
 
-    public void createCategory(UUID userId, String name, CategoryType type, String color) {
-    List<Category> existing = repository.findByUserId(userId);
-    boolean nameExists = existing.stream()
-        .anyMatch(c -> c.getName().equalsIgnoreCase(name));
-
-    if (nameExists) {
-        throw new IllegalArgumentException("Kategorie mit diesem Namen existiert bereits.");
+    public void createCategory(UUID userId, String name, CategoryType type, String color, boolean isSavings) {
+        Category category = new Category(
+                UUID.randomUUID(),
+                userId,
+                name,
+                type,
+                color,
+                isSavings
+        );
+        repository.save(category);
     }
 
-    Category category = new Category(UUID.randomUUID(), userId, name, type, color);
-    repository.save(category);
-}
     public List<Category> getCategoriesForUser(UUID userId) {
         return repository.findByUserId(userId);
+    }
+
+    public Category getCategoryById(UUID categoryId) {
+        return repository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Kategorie nicht gefunden."));
     }
 }

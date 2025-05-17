@@ -34,7 +34,7 @@ public class CategoryServiceTest {
         CategoryType type = CategoryType.AUSGABE;
         String color = "grün";
 
-        categoryService.createCategory(userId, name, type, color);
+        categoryService.createCategory(userId, name, type, color, false); // false = kein Sparziel
 
         verify(categoryRepository, times(1)).save(any(Category.class));
     }
@@ -44,7 +44,7 @@ public class CategoryServiceTest {
         UUID userId = UUID.randomUUID();
 
         List<Category> expected = List.of(
-            new Category(UUID.randomUUID(), userId, "Lebensmittel", CategoryType.AUSGABE, "grün")
+            new Category(UUID.randomUUID(), userId, "Lebensmittel", CategoryType.AUSGABE, "grün", false) // ❗ boolean ergänzt
         );
 
         when(categoryRepository.findByUserId(userId)).thenReturn(expected);

@@ -1,13 +1,20 @@
 package de.marcel.monetenmanager.cli.user;
 
+import de.marcel.monetenmanager.application.user.MonthlyOverviewService;
+import de.marcel.monetenmanager.application.user.MonthlyOverviewService.OverviewEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
-import de.marcel.monetenmanager.application.user.MonthlyOverviewService;
-
 public class OverviewCLIHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(OverviewCLIHandler.class);
 
     private final MonthlyOverviewService service;
     private final Scanner scanner;
@@ -19,35 +26,48 @@ public class OverviewCLIHandler {
 
     public void handleOverview(UUID userId) {
         try {
-            System.out.print("Für welchen Monat? (z. B. 2025-05): ");
-            String input = scanner.nextLine();
-            YearMonth month = YearMonth.parse(input);
+            YearMonth month = readValidMonth("Für welchen Monat (YYYY-MM)? ");
+            List<OverviewEntry> entries = service.getMonthlyOverview(userId, month);
 
-            List<MonthlyOverviewService.OverviewEntry> entries = service.getMonthlyOverview(userId, month);
+            if (entries.isEmpty()) {
+                System.out.println("ℹ️ Keine Ausgaben in diesem Monat.");
+                return;
+            }
 
-            System.out.println("\n📊 Übersicht für " + month.getMonth() + " " + month.getYear());
-            System.out.println("-----------------------------------------");
-
-            for (var entry : entries) {
-                String status;
-                if (!entry.hasBudget()) {
-                    status = "(kein Budget)";
-                } else if (entry.spent().compareTo(entry.budgetAmount()) <= 0) {
-                    status = "✅";
-                } else {
-                    status = "❌ Budget überschritten";
+            System.out.printf("📊 Übersicht für %s\n", month);
+            for (OverviewEntry entry : entries) {
+                String status = "";
+                if (entry.hasBudget()) {
+                    if (entry.spent().compareTo(entry.budgetAmount()) > 0) {
+                        status = "⚠️ Überschritten!";
+                    } else {
+                        status = "✅ Im Rahmen";
+                    }
                 }
-
-                System.out.printf("• %s: %.2f € von %s %s\n",
-                        entry.categoryName(),
-                        entry.spent(),
-                        entry.budgetAmount() != null ? entry.budgetAmount() + " €" : "-",
-                        status
-                );
+                String icon = entry.hasBudget() && entry.budgetAmount() != null && entry.budgetAmount().signum() == 0
+                        ? "💰" : "";
+                System.out.printf("- %s%s: %.2f €", entry.categoryName(), icon, entry.spent());
+                if (entry.budgetAmount() != null) {
+                    System.out.printf(" / %.2f € Budget (%s)", entry.budgetAmount(), status);
+                }
+                System.out.println();
             }
 
         } catch (Exception e) {
-            System.out.println("❌ Fehler beim Anzeigen der Übersicht: " + e.getMessage());
+            System.out.println("❌ Fehler bei der Übersicht.");
+            log.error("Fehler beim Abrufen der Monatsübersicht", e);
+        }
+    }
+
+    private YearMonth readValidMonth(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine();
+            try {
+                return YearMonth.parse(input);
+            } catch (DateTimeParseException e) {
+                System.out.println("❌ Ungültiges Format. Bitte im Format YYYY-MM eingeben.");
+            }
         }
     }
 }

@@ -1,13 +1,13 @@
 package de.marcel.monetenmanager.infrastructure.category;
 
+import de.marcel.monetenmanager.domain.category.Category;
+import de.marcel.monetenmanager.domain.category.CategoryRepository;
+import de.marcel.monetenmanager.domain.category.CategoryType;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import de.marcel.monetenmanager.domain.category.Category;
-import de.marcel.monetenmanager.domain.category.CategoryRepository;
-import de.marcel.monetenmanager.domain.category.CategoryType;
 
 public class DatabaseCategoryRepository implements CategoryRepository {
 
@@ -19,13 +19,13 @@ public class DatabaseCategoryRepository implements CategoryRepository {
 
     @Override
     public void save(Category category) {
-        CategoryEntity entity = new CategoryEntity(
-                category.getId(),
-                category.getUserId(),
-                category.getName(),
-                CategoryTypeEntity.valueOf(category.getType().name()),
-                category.getColor()
-        );
+        CategoryEntity entity = new CategoryEntity();
+        entity.setId(category.getId());
+        entity.setUserId(category.getUserId());
+        entity.setName(category.getName());
+        entity.setType(Enum.valueOf(CategoryTypeEntity.class, category.getType().name()));
+        entity.setColor(category.getColor());
+        entity.setSavings(category.isSavings()); // ✅ NEU
         jpaRepository.save(entity);
     }
 
@@ -37,7 +37,8 @@ public class DatabaseCategoryRepository implements CategoryRepository {
                         e.getUserId(),
                         e.getName(),
                         CategoryType.valueOf(e.getType().name()),
-                        e.getColor()
+                        e.getColor(),
+                        e.isSavings() // ✅ NEU
                 ))
                 .collect(Collectors.toList());
     }
@@ -50,7 +51,8 @@ public class DatabaseCategoryRepository implements CategoryRepository {
                         e.getUserId(),
                         e.getName(),
                         CategoryType.valueOf(e.getType().name()),
-                        e.getColor()
+                        e.getColor(),
+                        e.isSavings() // ✅ NEU
                 ));
     }
 }

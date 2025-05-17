@@ -1,14 +1,5 @@
 package de.marcel.monetenmanager.main;
 
-import java.util.Scanner;
-
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
 import de.marcel.monetenmanager.application.budget.BudgetService;
 import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.application.transaction.TransactionService;
@@ -30,6 +21,15 @@ import de.marcel.monetenmanager.infrastructure.transaction.DatabaseTransactionRe
 import de.marcel.monetenmanager.infrastructure.transaction.TransactionJpaRepository;
 import de.marcel.monetenmanager.infrastructure.user.DatabaseUserRepository;
 import de.marcel.monetenmanager.infrastructure.user.UserJpaRepository;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import java.util.Scanner;
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = "de.marcel.monetenmanager.infrastructure")
@@ -60,7 +60,7 @@ public class MonetenmanagerApplication implements CommandLineRunner {
     public void run(String... args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Infrastruktur
+        // Repositories
         var userRepository = new DatabaseUserRepository(userJpaRepository);
         var transactionRepository = new DatabaseTransactionRepository(transactionJpaRepository);
         var categoryRepository = new DatabaseCategoryRepository(categoryJpaRepository);
@@ -74,18 +74,19 @@ public class MonetenmanagerApplication implements CommandLineRunner {
         var budgetService = new BudgetService(budgetRepository);
         var overviewService = new MonthlyOverviewService(transactionRepository, categoryRepository, budgetRepository);
 
-        // CLI-Handler über Factory erzeugen
-        var userCLIHandler = new UserCLIHandler(registrationService, loginService, scanner);
+        // CLI Handler Factory
+        var userCLIHandler = new UserCLIHandler(registrationService, loginService, categoryService, scanner);
+        var transactionCLIHandler = new TransactionCLIHandler(transactionService, categoryService, scanner);
         var categoryCLIHandler = new CategoryCLIHandler(categoryService, scanner);
-        var transactionCLIHandler = new TransactionCLIHandler(transactionService, scanner);
         var budgetCLIHandler = new BudgetCLIHandler(budgetService, categoryService, scanner);
         var overviewCLIHandler = new OverviewCLIHandler(overviewService, scanner);
 
         var cliHandlerFactory = new CLIHandlerFactory(
-            userCLIHandler,
-            categoryCLIHandler,
-            transactionCLIHandler,
-            budgetCLIHandler
+                userCLIHandler,
+                transactionCLIHandler,
+                categoryCLIHandler,
+                budgetCLIHandler,
+                overviewCLIHandler
         );
 
         User currentUser = null;
@@ -108,48 +109,53 @@ public class MonetenmanagerApplication implements CommandLineRunner {
             String input = scanner.nextLine();
 
             switch (input) {
-                case "1" -> ((UserCLIHandler) cliHandlerFactory.getHandler("user")).handleRegistration();
+                case "1" -> userCLIHandler.handleRegistration(categoryService);
                 case "2" -> {
-                    currentUser = ((UserCLIHandler) cliHandlerFactory.getHandler("user")).handleLogin();
+                    currentUser = cliHandlerFactory.userHandler().handleLogin();
                     if (currentUser != null) {
                         System.out.println("➡️ Eingeloggt als " + currentUser.getName());
                     }
                 }
                 case "3" -> {
                     if (currentUser != null)
-                        ((TransactionCLIHandler) cliHandlerFactory.getHandler("transaction")).handleAddTransaction(currentUser.getId());
+                        cliHandlerFactory.transactionHandler().handleAddTransaction(currentUser.getId());
                     else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "4" -> {
                     if (currentUser != null)
-                        ((TransactionCLIHandler) cliHandlerFactory.getHandler("transaction")).handleListTransactions(currentUser.getId());
+                        cliHandlerFactory.transactionHandler().handleListTransactions(currentUser.getId());
                     else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "5" -> {
                     if (currentUser != null)
-                        ((CategoryCLIHandler) cliHandlerFactory.getHandler("category")).handleCreateCategory(currentUser.getId());
+                        cliHandlerFactory.categoryHandler().handleCreateCategory(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "6" -> {
                     if (currentUser != null)
-                        ((CategoryCLIHandler) cliHandlerFactory.getHandler("category")).handleListCategories(currentUser.getId());
+                        cliHandlerFactory.categoryHandler().handleListCategories(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "7" -> {
                     if (currentUser != null)
-                        ((BudgetCLIHandler) cliHandlerFactory.getHandler("budget")).handleCreateBudget(currentUser.getId());
+                        cliHandlerFactory.budgetHandler().handleCreateBudget(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "8" -> {
                     if (currentUser != null)
-                        ((BudgetCLIHandler) cliHandlerFactory.getHandler("budget")).handleListBudgets(currentUser.getId());
+                        cliHandlerFactory.budgetHandler().handleListBudgets(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "9" -> {
                     if (currentUser != null)
-                        overviewCLIHandler.handleOverview(currentUser.getId());
+                        cliHandlerFactory.overviewHandler().handleOverview(currentUser.getId());
+                    else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "0" -> {
-                    System.out.println("Bis bald!");
+                    System.out.println("👋 Bis bald!");
                     return;
                 }
-                default -> System.out.println("Ungültige Auswahl.");
+                default -> System.out.println("❌ Ungültige Auswahl.");
             }
         }
     }
