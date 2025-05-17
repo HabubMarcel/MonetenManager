@@ -1,28 +1,24 @@
 package de.marcel.monetenmanager.domain.category;
 
 import java.util.UUID;
+import java.util.Objects;
 
 public class Category {
 
     private final UUID id;
     private final UUID userId;
-    private final String name;
+    private final CategoryName name;
     private final CategoryType type;
-    private final String color;
-
+    private final CategoryColor color;
     private final boolean isSavings;
 
-    public Category(UUID id, UUID userId, String name, CategoryType type, String color, boolean isSavings) {
+    public Category(UUID id, UUID userId, CategoryName name, CategoryType type, CategoryColor color, boolean isSavings) {
         this.id = id;
         this.userId = userId;
         this.name = name;
         this.type = type;
         this.color = color;
         this.isSavings = isSavings;
-    }
-
-    public boolean isSavings() {
-        return isSavings;
     }
 
     public UUID getId() {
@@ -33,7 +29,7 @@ public class Category {
         return userId;
     }
 
-    public String getName() {
+    public CategoryName getName() {
         return name;
     }
 
@@ -41,8 +37,24 @@ public class Category {
         return type;
     }
 
-    public String getColor() {
+    public CategoryColor getColor() {
         return color;
     }
 
+    public boolean isSavings() {
+        return isSavings;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return id.equals(category.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

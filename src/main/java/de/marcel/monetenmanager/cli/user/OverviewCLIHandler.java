@@ -1,9 +1,10 @@
 package de.marcel.monetenmanager.cli.user;
 
-import de.marcel.monetenmanager.application.user.MonthlyOverviewService;
-import de.marcel.monetenmanager.application.user.MonthlyOverviewService.OverviewEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService.OverviewEntry;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -38,17 +39,17 @@ public class OverviewCLIHandler {
             for (OverviewEntry entry : entries) {
                 String status = "";
                 if (entry.hasBudget()) {
-                    if (entry.spent().compareTo(entry.budgetAmount()) > 0) {
+                    if (entry.spent().compareTo(entry.budgetAmount().getValue()) > 0) {
                         status = "⚠️ Überschritten!";
                     } else {
                         status = "✅ Im Rahmen";
                     }
                 }
-                String icon = entry.hasBudget() && entry.budgetAmount() != null && entry.budgetAmount().signum() == 0
+                String icon = entry.hasBudget() && entry.budgetAmount() != null && entry.budgetAmount().getValue().signum() == 0
                         ? "💰" : "";
                 System.out.printf("- %s%s: %.2f €", entry.categoryName(), icon, entry.spent());
                 if (entry.budgetAmount() != null) {
-                    System.out.printf(" / %.2f € Budget (%s)", entry.budgetAmount(), status);
+                    System.out.printf(" / %.2f € Budget (%s)", entry.budgetAmount().getValue(), status);
                 }
                 System.out.println();
             }

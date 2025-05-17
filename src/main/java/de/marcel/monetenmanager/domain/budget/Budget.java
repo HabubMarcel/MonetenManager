@@ -4,17 +4,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import de.marcel.monetenmanager.domain.shared.Amount;
+
 public class Budget {
 
+    private final Amount amount;
     private final UUID id;
     private final UUID userId;
     private final UUID categoryId;
     private final String name;
-    private final BigDecimal amount;
     private final LocalDate startDate;
     private final LocalDate endDate;
 
-    public Budget(UUID id, UUID userId, UUID categoryId, String name, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
+    public Budget(UUID id, UUID userId, UUID categoryId, String name, Amount amount, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.userId = userId;
         this.categoryId = categoryId;
@@ -36,11 +38,11 @@ public class Budget {
         return categoryId;
     }
 
-    public String getName() {
+    public String getName(){
         return name;
     }
-
-    public BigDecimal getAmount() {
+    
+    public Amount getAmount() {
         return amount;
     }
 

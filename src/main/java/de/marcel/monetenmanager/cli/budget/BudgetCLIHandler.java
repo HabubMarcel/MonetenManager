@@ -14,6 +14,8 @@ import de.marcel.monetenmanager.application.budget.BudgetService;
 import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.domain.budget.Budget;
 import de.marcel.monetenmanager.domain.category.Category;
+import de.marcel.monetenmanager.domain.category.CategoryName;
+import de.marcel.monetenmanager.domain.shared.Amount;
 
 public class BudgetCLIHandler {
 
@@ -54,8 +56,9 @@ public class BudgetCLIHandler {
             System.out.print("Kategorie-Name: ");
             String categoryName = scanner.nextLine();
 
+            CategoryName inputName = new CategoryName(categoryName);
             List<Category> matching = categories.stream()
-                    .filter(c -> c.getName().equalsIgnoreCase(categoryName))
+                    .filter(c -> c.getName().equals(inputName))
                     .toList();
 
             if (matching.isEmpty()) {
@@ -80,7 +83,7 @@ public class BudgetCLIHandler {
             LocalDate startDate = readValidDate("Startdatum (YYYY-MM-DD): ");
             LocalDate endDate = readValidDate("Enddatum (YYYY-MM-DD): ");
 
-            service.createBudget(userId, categoryId, name, amount, startDate, endDate);
+            service.createBudget(userId, categoryId, name, new Amount(amount), startDate, endDate);
             System.out.println("✅ Budget gespeichert.");
             log.info("Budget für Benutzer {} erstellt: {}", userId, name);
 
@@ -111,8 +114,13 @@ public class BudgetCLIHandler {
             System.out.println("📊 Budgets:");
             for (Budget b : budgets) {
                 System.out.printf("[%s] %s: %.2f € (%s bis %s, Kategorie-ID: %s)\n",
-                        b.getId(), b.getName(), b.getAmount(),
-                        b.getStartDate(), b.getEndDate(), b.getCategoryId());
+                        b.getId(),
+                        b.getName(),
+                        b.getAmount().getValue(), // 🔧 Zugriff auf BigDecimal aus Amount
+                        b.getStartDate(),
+                        b.getEndDate(),
+                        b.getCategoryId()
+                );
             }
         }
     }

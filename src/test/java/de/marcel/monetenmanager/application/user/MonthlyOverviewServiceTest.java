@@ -17,11 +17,15 @@ import static org.mockito.Mockito.when;
 
 import de.marcel.monetenmanager.domain.budget.BudgetRepository;
 import de.marcel.monetenmanager.domain.category.Category;
+import de.marcel.monetenmanager.domain.category.CategoryColor;
+import de.marcel.monetenmanager.domain.category.CategoryName;
 import de.marcel.monetenmanager.domain.category.CategoryRepository;
 import de.marcel.monetenmanager.domain.category.CategoryType;
+import de.marcel.monetenmanager.domain.shared.Amount;
 import de.marcel.monetenmanager.domain.transaction.Transaction;
 import de.marcel.monetenmanager.domain.transaction.TransactionRepository;
 import de.marcel.monetenmanager.domain.transaction.TransactionType;
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
 
 public class MonthlyOverviewServiceTest {
 
@@ -42,19 +46,20 @@ public class MonthlyOverviewServiceTest {
     @Test
     public void testGenerateMonthlyOverview_returnsCorrectStructure() {
         UUID userId = UUID.randomUUID();
-        LocalDate month = LocalDate.of(2025, 5, 1);
+        YearMonth month = YearMonth.of(2025, 5);
 
-        Transaction t1 = new Transaction(UUID.randomUUID(), userId, "Essen", new BigDecimal("50.00"),
-                                         TransactionType.AUSGABE, LocalDateTime.of(2025, 5, 10, 10, 0));
-        Transaction t2 = new Transaction(UUID.randomUUID(), userId, "Essen", new BigDecimal("30.00"),
-                                         TransactionType.AUSGABE, LocalDateTime.of(2025, 5, 12, 12, 0));
+        Transaction t1 = new Transaction(UUID.randomUUID(), userId, "Essen", new Amount(new BigDecimal("50.00")),
+            TransactionType.AUSGABE, LocalDateTime.of(2025, 5, 10, 10, 0));
+        Transaction t2 = new Transaction(UUID.randomUUID(), userId, "Essen", new Amount(new BigDecimal("30.00")),
+            TransactionType.AUSGABE, LocalDateTime.of(2025, 5, 12, 12, 0));
 
         when(transactionRepository.findByUserId(userId)).thenReturn(List.of(t1, t2));
         when(categoryRepository.findByUserId(userId)).thenReturn(List.of(
-            new Category(UUID.randomUUID(), userId, "Essen", CategoryType.AUSGABE, "rot", false)  // ⬅️ angepasst
+            new Category(UUID.randomUUID(), userId, new CategoryName("Essen"), CategoryType.AUSGABE, new CategoryColor("rot"), false)
         ));
+        when(budgetRepository.findByUserId(userId)).thenReturn(List.of());
 
-        List<MonthlyOverviewService.OverviewEntry> overview = overviewService.getMonthlyOverview(userId, YearMonth.of(2025, 5));
+        List<MonthlyOverviewService.OverviewEntry> overview = overviewService.getMonthlyOverview(userId, month);
 
         assertEquals(1, overview.size());
         assertEquals("Essen", overview.get(0).categoryName());

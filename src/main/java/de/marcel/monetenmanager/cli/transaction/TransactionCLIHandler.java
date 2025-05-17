@@ -13,6 +13,8 @@ import de.marcel.monetenmanager.application.transaction.TransactionService;
 import de.marcel.monetenmanager.domain.transaction.Transaction;
 import de.marcel.monetenmanager.domain.transaction.TransactionType;
 import de.marcel.monetenmanager.domain.category.Category;
+import de.marcel.monetenmanager.domain.category.CategoryName;
+import de.marcel.monetenmanager.domain.shared.Amount;
 
 
 public class TransactionCLIHandler {
@@ -51,8 +53,10 @@ public class TransactionCLIHandler {
         String categoryName = scanner.nextLine();
 
         // Kategorie suchen
+        CategoryName inputName = new CategoryName(categoryName);  // Eingabe des Nutzers als Value Object
+
         List<Category> matched = categories.stream()
-            .filter(c -> c.getName().equalsIgnoreCase(categoryName))
+            .filter(c -> c.getName().equals(inputName))
             .toList();
 
         if (matched.isEmpty()) {
@@ -67,10 +71,11 @@ public class TransactionCLIHandler {
             return;
         }
 
-        String category = matched.get(0).getName();
+        String category = matched.get(0).getName().getValue();
 
         System.out.print("Betrag (z. B. 50.00): ");
-        BigDecimal amount = new BigDecimal(scanner.nextLine());
+        BigDecimal amountInput = new BigDecimal(scanner.nextLine());
+        Amount amount = new Amount(amountInput);
 
         System.out.print("Typ (EINNAHME/AUSGABE): ");
         TransactionType type = TransactionType.valueOf(scanner.nextLine().toUpperCase());

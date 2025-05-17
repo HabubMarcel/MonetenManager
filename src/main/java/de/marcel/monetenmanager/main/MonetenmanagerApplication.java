@@ -3,7 +3,6 @@ package de.marcel.monetenmanager.main;
 import de.marcel.monetenmanager.application.budget.BudgetService;
 import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.application.transaction.TransactionService;
-import de.marcel.monetenmanager.application.user.MonthlyOverviewService;
 import de.marcel.monetenmanager.application.user.UserLoginService;
 import de.marcel.monetenmanager.application.user.UserRegistrationService;
 import de.marcel.monetenmanager.cli.CLIHandlerFactory;
@@ -12,6 +11,7 @@ import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
 import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
 import de.marcel.monetenmanager.cli.user.OverviewCLIHandler;
 import de.marcel.monetenmanager.cli.user.UserCLIHandler;
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
 import de.marcel.monetenmanager.domain.user.User;
 import de.marcel.monetenmanager.infrastructure.budget.BudgetJpaRepository;
 import de.marcel.monetenmanager.infrastructure.budget.DatabaseBudgetRepository;
@@ -109,7 +109,7 @@ public class MonetenmanagerApplication implements CommandLineRunner {
             String input = scanner.nextLine();
 
             switch (input) {
-                case "1" -> userCLIHandler.handleRegistration(categoryService);
+                case "1" -> userCLIHandler.handleRegistration();
                 case "2" -> {
                     currentUser = cliHandlerFactory.userHandler().handleLogin();
                     if (currentUser != null) {

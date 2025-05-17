@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import de.marcel.monetenmanager.domain.budget.Budget;
 import de.marcel.monetenmanager.domain.budget.BudgetRepository;
+import de.marcel.monetenmanager.domain.shared.Amount; // ✅ neu
 
 public class BudgetServiceTest {
 
@@ -33,7 +34,7 @@ public class BudgetServiceTest {
         UUID userId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
         String name = "Monatliches Gaming-Budget";
-        BigDecimal amount = new BigDecimal("150.00");
+        Amount amount = new Amount(new BigDecimal("150.00")); // ✅ geändert
         LocalDate start = LocalDate.of(2025, 5, 1);
         LocalDate end = LocalDate.of(2025, 5, 31);
 
@@ -46,7 +47,8 @@ public class BudgetServiceTest {
     public void testGetBudgetsForUser_returnsList() {
         UUID userId = UUID.randomUUID();
         List<Budget> expected = List.of(
-            new Budget(UUID.randomUUID(), userId, UUID.randomUUID(), "Games", new BigDecimal("100.00"),
+            new Budget(UUID.randomUUID(), userId, UUID.randomUUID(), "Games",
+                       new Amount(new BigDecimal("100.00")), // ✅ geändert
                        LocalDate.of(2025, 5, 1), LocalDate.of(2025, 5, 31))
         );
 
@@ -56,7 +58,7 @@ public class BudgetServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("Games", result.get(0).getName());
-        assertEquals(new BigDecimal("100.00"), result.get(0).getAmount());
+        assertEquals(new BigDecimal("100.00"), result.get(0).getAmount().getValue()); // ✅ angepasst
 
         verify(budgetRepository, times(1)).findByUserId(userId);
     }

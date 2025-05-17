@@ -14,8 +14,8 @@ public class UserRegistrationService {
         this.userRepository = userRepository;
     }
 
-    public UUID registerUser(String name, String emailStr, String password) {
-        Email email = new Email(emailStr);
+    public UUID registerUser(String name, String emailRaw, String password) {
+        Email email = new Email(emailRaw);
 
         Optional<User> existing = userRepository.findByEmail(email);
         if (existing.isPresent()) {

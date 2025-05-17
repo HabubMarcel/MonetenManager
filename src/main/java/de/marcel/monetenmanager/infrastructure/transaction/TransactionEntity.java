@@ -45,6 +45,8 @@ public class TransactionEntity {
         this.timestamp = timestamp;
     }
 
+    
+
     // Getter
     public UUID getId() { return id; }
     public UUID getUserId() { return userId; }

@@ -4,16 +4,18 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import de.marcel.monetenmanager.domain.shared.Amount;
+
 public class Transaction {
 
     private final UUID id;
     private final UUID userId;
     private final String category;
-    private final BigDecimal amount;
+    private final Amount amount;
     private final TransactionType type;
     private final LocalDateTime timestamp;
 
-    public Transaction(UUID id, UUID userId, String category, BigDecimal amount, TransactionType type, LocalDateTime timestamp) {
+    public Transaction(UUID id, UUID userId, String category, Amount amount, TransactionType type, LocalDateTime timestamp) {
         this.id = id;
         this.userId = userId;
         this.category = category;
@@ -34,7 +36,7 @@ public class Transaction {
         return category;
     }
 
-    public BigDecimal getAmount() {
+    public Amount getAmount() {
         return amount;
     }
 

@@ -13,6 +13,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.marcel.monetenmanager.domain.category.Category;
+import de.marcel.monetenmanager.domain.category.CategoryColor;
+import de.marcel.monetenmanager.domain.category.CategoryName;
 import de.marcel.monetenmanager.domain.category.CategoryRepository;
 import de.marcel.monetenmanager.domain.category.CategoryType;
 
@@ -30,31 +32,38 @@ public class CategoryServiceTest {
     @Test
     public void testCreateCategory_savesCategory() {
         UUID userId = UUID.randomUUID();
-        String name = "Lebensmittel";
+        CategoryName name = new CategoryName("Lebensmittel");
         CategoryType type = CategoryType.AUSGABE;
-        String color = "grün";
+        CategoryColor color = new CategoryColor("grün");
 
         categoryService.createCategory(userId, name, type, color, false); // false = kein Sparziel
 
         verify(categoryRepository, times(1)).save(any(Category.class));
     }
 
-    @Test
-    public void testGetCategoriesForUser_returnsList() {
-        UUID userId = UUID.randomUUID();
+@Test
+public void testGetCategoriesForUser_returnsList() {
+    UUID userId = UUID.randomUUID();
 
-        List<Category> expected = List.of(
-            new Category(UUID.randomUUID(), userId, "Lebensmittel", CategoryType.AUSGABE, "grün", false) // ❗ boolean ergänzt
-        );
+    List<Category> expected = List.of(
+        new Category(
+            UUID.randomUUID(),
+            userId,
+            new CategoryName("Lebensmittel"),
+            CategoryType.AUSGABE,
+            new CategoryColor("grün"),
+            false
+        )
+    );
 
-        when(categoryRepository.findByUserId(userId)).thenReturn(expected);
+    when(categoryRepository.findByUserId(userId)).thenReturn(expected);
 
-        List<Category> result = categoryService.getCategoriesForUser(userId);
+    List<Category> result = categoryService.getCategoriesForUser(userId);
 
-        assertEquals(1, result.size());
-        assertEquals("Lebensmittel", result.get(0).getName());
-        assertEquals(CategoryType.AUSGABE, result.get(0).getType());
+    assertEquals(1, result.size());
+    assertEquals("Lebensmittel", result.get(0).getName().getValue());
+    assertEquals(CategoryType.AUSGABE, result.get(0).getType());
 
-        verify(categoryRepository, times(1)).findByUserId(userId);
-    }
+    verify(categoryRepository, times(1)).findByUserId(userId);
+}
 }

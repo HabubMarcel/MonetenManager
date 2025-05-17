@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import de.marcel.monetenmanager.domain.budget.Budget;
 import de.marcel.monetenmanager.domain.budget.BudgetRepository;
+import de.marcel.monetenmanager.domain.shared.Amount;
 
 public class BudgetService {
 
@@ -16,7 +17,7 @@ public class BudgetService {
         this.repository = repository;
     }
 
-    public void createBudget(UUID userId, UUID categoryId, String name, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
+    public void createBudget(UUID userId, UUID categoryId, String name, Amount amount, LocalDate startDate, LocalDate endDate) {
         Budget budget = new Budget(UUID.randomUUID(), userId, categoryId, name, amount, startDate, endDate);
         repository.save(budget);
     }

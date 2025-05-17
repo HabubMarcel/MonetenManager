@@ -13,19 +13,9 @@ public class UserLoginService {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> login(String emailStr, String password) {
-        Email email;
-        try {
-            email = new Email(emailStr);
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
-
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
-            return userOpt;
-        }
-
-        return Optional.empty();
+    public Optional<User> login(String emailRaw, String password) {
+        Email email = new Email(emailRaw);
+        return userRepository.findByEmail(email)
+        .filter(user -> user.getPassword().equals(password));
     }
 }

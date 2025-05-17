@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import de.marcel.monetenmanager.domain.budget.Budget;
 import de.marcel.monetenmanager.domain.budget.BudgetRepository;
+import de.marcel.monetenmanager.domain.shared.Amount;
 
 public class DatabaseBudgetRepository implements BudgetRepository {
 
@@ -22,7 +23,7 @@ public class DatabaseBudgetRepository implements BudgetRepository {
                 budget.getUserId(),
                 budget.getCategoryId(),
                 budget.getName(),
-                budget.getAmount(),
+                budget.getAmount().getValue(),
                 budget.getStartDate(),
                 budget.getEndDate()
         );
@@ -37,7 +38,7 @@ public class DatabaseBudgetRepository implements BudgetRepository {
                         e.getUserId(),
                         e.getCategoryId(),
                         e.getName(),
-                        e.getAmount(),
+                        new Amount(e.getAmount()),
                         e.getStartDate(),
                         e.getEndDate()
                 ))

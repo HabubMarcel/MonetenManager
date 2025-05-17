@@ -29,7 +29,7 @@ public class DatabaseUserRepository implements UserRepository {
     @Override
     public Optional<User> findByEmail(Email email) {
         return jpaRepository.findByEmail(email.getValue())
-                .map(this::mapToDomain);
+            .map(this::mapToDomain);
     }
 
     @Override
@@ -39,11 +39,11 @@ public class DatabaseUserRepository implements UserRepository {
     }
 
     private User mapToDomain(UserEntity entity) {
-        return new User(
-                entity.getId(),
-                entity.getName(),
-                new Email(entity.getEmail()),
-                entity.getPassword()
+    return new User(
+            entity.getId(),
+            entity.getName(),
+            new Email(entity.getEmail()),
+            entity.getPassword()
         );
     }
 }

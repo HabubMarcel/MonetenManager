@@ -10,22 +10,25 @@ import org.slf4j.LoggerFactory;
 import de.marcel.monetenmanager.application.category.CategoryService;
 import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
 import de.marcel.monetenmanager.domain.category.Category;
+import de.marcel.monetenmanager.domain.category.CategoryColor;
+import de.marcel.monetenmanager.domain.category.CategoryName;
 import de.marcel.monetenmanager.domain.category.CategoryType;
+import de.marcel.monetenmanager.application.category.CategoryService;;;
 
 public class CategoryCLIHandler {
     private static final Logger log = LoggerFactory.getLogger(TransactionCLIHandler.class);
-    private final CategoryService service;
+    private final CategoryService categoryService;
     private final Scanner scanner;
 
     public CategoryCLIHandler(CategoryService service, Scanner scanner) {
-        this.service = service;
+        this.categoryService = service;
         this.scanner = scanner;
     }
 
     public void handleCreateCategory(UUID userId) {
         try {
             System.out.println("ℹ️ Aktuelle Kategorien:");
-            List<Category> existing = service.getCategoriesForUser(userId);
+            List<Category> existing = categoryService.getCategoriesForUser(userId);
             if (existing.isEmpty()) {
                 System.out.println("Keine vorhanden.");
             } else {
@@ -41,18 +44,20 @@ public class CategoryCLIHandler {
 
             System.out.print("Name der Kategorie: ");
             String name = scanner.nextLine();
+            CategoryName nameObj = new CategoryName(name);
 
             System.out.print("Typ (EINNAHME/AUSGABE): ");
             CategoryType type = CategoryType.valueOf(scanner.nextLine().toUpperCase());
 
             System.out.print("Farbe (z. B. blau, grün): ");
             String color = scanner.nextLine();
+            CategoryColor colorObj = new CategoryColor(color);
 
             System.out.print("Ist dies ein Sparziel? (j/n): ");
             String savingsInput = scanner.nextLine().trim().toLowerCase();
             boolean isSavings = savingsInput.startsWith("j");
 
-            service.createCategory(userId, name, type, color, isSavings);
+            categoryService.createCategory(userId, nameObj, type, colorObj, isSavings);
             System.out.println("✅ Kategorie gespeichert.");
 
         } catch (Exception e) {
@@ -62,7 +67,7 @@ public class CategoryCLIHandler {
     }
 
     public void handleListCategories(UUID userId) {
-        List<Category> categories = service.getCategoriesForUser(userId);
+        List<Category> categories = categoryService.getCategoriesForUser(userId);
 
         if (categories.isEmpty()) {
             System.out.println("ℹ️ Noch keine Kategorien vorhanden.");
