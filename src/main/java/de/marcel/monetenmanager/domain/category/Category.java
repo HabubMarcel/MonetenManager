@@ -1,7 +1,7 @@
 package de.marcel.monetenmanager.domain.category;
 
-import java.util.UUID;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Category {
 

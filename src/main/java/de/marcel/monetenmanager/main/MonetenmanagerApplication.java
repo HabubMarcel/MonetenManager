@@ -1,26 +1,6 @@
 package de.marcel.monetenmanager.main;
 
-import de.marcel.monetenmanager.application.budget.BudgetService;
-import de.marcel.monetenmanager.application.category.CategoryService;
-import de.marcel.monetenmanager.application.transaction.TransactionService;
-import de.marcel.monetenmanager.application.user.UserLoginService;
-import de.marcel.monetenmanager.application.user.UserRegistrationService;
-import de.marcel.monetenmanager.cli.CLIHandlerFactory;
-import de.marcel.monetenmanager.cli.budget.BudgetCLIHandler;
-import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
-import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
-import de.marcel.monetenmanager.cli.user.OverviewCLIHandler;
-import de.marcel.monetenmanager.cli.user.UserCLIHandler;
-import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
-import de.marcel.monetenmanager.domain.user.User;
-import de.marcel.monetenmanager.infrastructure.budget.BudgetJpaRepository;
-import de.marcel.monetenmanager.infrastructure.budget.DatabaseBudgetRepository;
-import de.marcel.monetenmanager.infrastructure.category.CategoryJpaRepository;
-import de.marcel.monetenmanager.infrastructure.category.DatabaseCategoryRepository;
-import de.marcel.monetenmanager.infrastructure.transaction.DatabaseTransactionRepository;
-import de.marcel.monetenmanager.infrastructure.transaction.TransactionJpaRepository;
-import de.marcel.monetenmanager.infrastructure.user.DatabaseUserRepository;
-import de.marcel.monetenmanager.infrastructure.user.UserJpaRepository;
+import java.util.Scanner;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -29,11 +9,31 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.util.Scanner;
+import de.marcel.monetenmanager.cli.CLIHandlerFactory;
+import de.marcel.monetenmanager.cli.budget.BudgetCLIHandler;
+import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
+import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
+import de.marcel.monetenmanager.cli.user.OverviewCLIHandler;
+import de.marcel.monetenmanager.cli.user.UserCLIHandler;
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
+import de.marcel.monetenmanager.domain.user.User;
+import de.marcel.monetenmanager.repository.budget.BudgetJpaRepository;
+import de.marcel.monetenmanager.repository.budget.DatabaseBudgetRepository;
+import de.marcel.monetenmanager.repository.category.CategoryJpaRepository;
+import de.marcel.monetenmanager.repository.category.DatabaseCategoryRepository;
+import de.marcel.monetenmanager.repository.transaction.DatabaseTransactionRepository;
+import de.marcel.monetenmanager.repository.transaction.TransactionJpaRepository;
+import de.marcel.monetenmanager.repository.user.DatabaseUserRepository;
+import de.marcel.monetenmanager.repository.user.UserJpaRepository;
+import de.marcel.monetenmanager.service.budget.BudgetService;
+import de.marcel.monetenmanager.service.category.CategoryService;
+import de.marcel.monetenmanager.service.transaction.TransactionService;
+import de.marcel.monetenmanager.service.user.UserLoginService;
+import de.marcel.monetenmanager.service.user.UserRegistrationService;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "de.marcel.monetenmanager.infrastructure")
-@EntityScan(basePackages = "de.marcel.monetenmanager.infrastructure")
+@EnableJpaRepositories(basePackages = "de.marcel.monetenmanager.repository")
+@EntityScan(basePackages = "de.marcel.monetenmanager.repository")
 @ComponentScan(basePackages = "de.marcel.monetenmanager")
 public class MonetenmanagerApplication implements CommandLineRunner {
 
@@ -152,10 +152,10 @@ public class MonetenmanagerApplication implements CommandLineRunner {
                     else System.out.println("Bitte zuerst einloggen.");
                 }
                 case "0" -> {
-                    System.out.println("👋 Bis bald!");
+                    System.out.println("Bis bald!");
                     return;
                 }
-                default -> System.out.println("❌ Ungültige Auswahl.");
+                default -> System.out.println("X Ungültige Auswahl.");
             }
         }
     }

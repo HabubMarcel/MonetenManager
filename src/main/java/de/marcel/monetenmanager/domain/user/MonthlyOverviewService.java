@@ -2,7 +2,11 @@ package de.marcel.monetenmanager.domain.user;
 
 import java.math.BigDecimal;
 import java.time.YearMonth;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import de.marcel.monetenmanager.domain.budget.Budget;
@@ -41,7 +45,7 @@ public class MonthlyOverviewService {
             .filter(t -> t.getType() == TransactionType.AUSGABE)
             .filter(t -> YearMonth.from(t.getTimestamp()).equals(month))
             .collect(Collectors.groupingBy(
-                t -> t.getCategory().toString(), // String über CategoryName
+                t -> t.getCategory(),
                 Collectors.reducing(BigDecimal.ZERO, t -> t.getAmount().getValue(), BigDecimal::add)
             ));
 

@@ -7,14 +7,14 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.marcel.monetenmanager.application.category.CategoryService;
-import de.marcel.monetenmanager.application.user.UserLoginService;
-import de.marcel.monetenmanager.application.user.UserRegistrationService;
 import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
 import de.marcel.monetenmanager.domain.category.CategoryColor;
 import de.marcel.monetenmanager.domain.category.CategoryName;
 import de.marcel.monetenmanager.domain.category.CategoryType;
 import de.marcel.monetenmanager.domain.user.User;
+import de.marcel.monetenmanager.service.category.CategoryService;
+import de.marcel.monetenmanager.service.user.UserLoginService;
+import de.marcel.monetenmanager.service.user.UserRegistrationService;
 
 public class UserCLIHandler {
     private final UserRegistrationService registrationService;
@@ -44,11 +44,11 @@ public class UserCLIHandler {
             String password = promptPassword();
 
             UUID userId = registrationService.registerUser(name, email, password);
-            System.out.println("✅ Benutzer registriert mit ID: " + userId);
-            System.out.println("\n👉 Hinweis: Kategorien sind wichtig, um Transaktionen und Budgets zu verwalten.");
+            System.out.println("Benutzer registriert mit ID: " + userId);
+            System.out.println("\n Hinweis: Kategorien sind wichtig, um Transaktionen und Budgets zu verwalten.");
 
             System.out.println("""
-            📦 Möchtest du mit folgenden Standardkategorien starten?
+              Möchtest du mit folgenden Standardkategorien starten?
 
                 - Gehalt (EINNAHME)
                 - Lebensmittel (AUSGABE)
@@ -62,8 +62,8 @@ public class UserCLIHandler {
             if (choice.equals("j")) {
                 createDefaultCategories(userId);
             } else {
-                System.out.println("\n✍️ Bitte erstelle jetzt mindestens 3 eigene Kategorien.");
-                System.out.println("📌 Hinweis: Wähle eindeutige Namen – z. B. 'Miete', nicht mehrfach 'Kosten'.\n");
+                System.out.println("\n Bitte erstelle jetzt mindestens 3 eigene Kategorien.");
+                System.out.println("Hinweis: Wähle eindeutige Namen -z.B. 'Miete', nicht mehrfach 'Kosten'.\n");
 
                 for (int i = 1; i <= 3; i++) {
                     System.out.println("Kategorie " + i + ":");
@@ -73,8 +73,8 @@ public class UserCLIHandler {
             }
 
         } catch (IllegalArgumentException ex) {
-            log.error("❌ Fehler beim Registrieren: {}", ex.getMessage());
-            System.out.println("❌ Registrieren fehlgeschlagen.");
+            log.error("X Fehler beim Registrieren: {}", ex.getMessage());
+            System.out.println("X Registrieren fehlgeschlagen.");
         }
     }
 
@@ -89,23 +89,23 @@ public class UserCLIHandler {
             return loginService.login(emailInput, password)
                     .map(user -> {
                         log.info("Login erfolgreich für Benutzer: {}", user.getEmail());
-                        System.out.println("✅ Login erfolgreich. Willkommen, " + user.getName() + "!");
+                        System.out.println("Login erfolgreich. Willkommen, " + user.getName() + "!");
                         handleFirstTimeSetup(user.getId());
                         return user;
                     })
                     .orElseGet(() -> {
                         log.warn("Login fehlgeschlagen für E-Mail: {}", emailInput);
-                        System.out.println("❌ Login fehlgeschlagen.");
+                        System.out.println("X Login fehlgeschlagen.");
                         return null;
                     });
 
         } catch (IllegalArgumentException ex) {
             log.error("Ungültige Eingabe beim Login: {}", ex.getMessage());
-            System.out.println("❌ Ungültige Eingaben: " + ex.getMessage());
+            System.out.println("X Ungültige Eingaben: " + ex.getMessage());
             return null;
         } catch (Exception e) {
             log.error("Technischer Fehler beim Login", e);
-            System.out.println("❌ Ein unerwarteter Fehler ist aufgetreten.");
+            System.out.println("X Ein unerwarteter Fehler ist aufgetreten.");
             return null;
         }
     }
@@ -113,9 +113,9 @@ public class UserCLIHandler {
 
     private void handleFirstTimeSetup(UUID userId) {
         if (categoryService.getCategoriesForUser(userId).isEmpty()) {
-            System.out.println("🔔 Hinweis: Kategorien sind essenziell für Budgets & Transaktionen.");
+            System.out.println("Hinweis: Kategorien sind essenziell für Budgets & Transaktionen.");
             System.out.println("""
-                📦 Möchtest du mit folgenden Standardkategorien starten?
+                  Möchtest du mit folgenden Standardkategorien starten?
 
                     - Gehalt (EINNAHME)
                     - Essen (AUSGABE)
@@ -123,7 +123,7 @@ public class UserCLIHandler {
                     - Sparen Auto (AUSGABE, Sparziel)
                     - Nebenjob (EINNAHME)
 
-                ℹ️ Hinweis: Gib eindeutige Namen – z. B. keine zwei Kategorien mit dem Namen „Essen“.
+                   Hinweis: Gib eindeutige Namen -z.B. keine zwei Kategorien mit dem Namen „Essen“.
             """);
             System.out.print("(j/n): ");
             String input = scanner.nextLine().trim().toLowerCase();
@@ -145,7 +145,7 @@ public class UserCLIHandler {
 
                     categoryService.createCategory(userId, name, type, color, savings);
                 }
-                System.out.println("✅ Kategorien gespeichert.");
+                System.out.println("Kategorien gespeichert.");
             }
         }
     }
@@ -156,7 +156,7 @@ public class UserCLIHandler {
         categoryService.createCategory(userId, new CategoryName("Sparen Urlaub"), CategoryType.AUSGABE, new CategoryColor("blau"), true);
         categoryService.createCategory(userId, new CategoryName("Sparen Auto"), CategoryType.AUSGABE, new CategoryColor("gelb"), true);
         categoryService.createCategory(userId, new CategoryName("Nebenjob"), CategoryType.EINNAHME, new CategoryColor("grau"), false);
-        System.out.println("✅ Standardkategorien wurden erstellt.");
+        System.out.println("Standardkategorien wurden erstellt.");
     }
 
     private String promptPassword() {
@@ -165,7 +165,7 @@ public class UserCLIHandler {
             char[] passwordChars = console.readPassword("Passwort: ");
             return new String(passwordChars);
         } else {
-            System.out.print("Passwort (⚠️ sichtbar): ");
+            System.out.print("Passwort (! sichtbar): ");
             return scanner.nextLine();
         }
     }

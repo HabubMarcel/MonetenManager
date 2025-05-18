@@ -1,17 +1,16 @@
 package de.marcel.monetenmanager.cli.user;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
-import de.marcel.monetenmanager.domain.user.MonthlyOverviewService.OverviewEntry;
-
-import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService;
+import de.marcel.monetenmanager.domain.user.MonthlyOverviewService.OverviewEntry;
 
 public class OverviewCLIHandler {
 
@@ -31,22 +30,22 @@ public class OverviewCLIHandler {
             List<OverviewEntry> entries = service.getMonthlyOverview(userId, month);
 
             if (entries.isEmpty()) {
-                System.out.println("ℹ️ Keine Ausgaben in diesem Monat.");
+                System.out.println("Keine Ausgaben in diesem Monat.");
                 return;
             }
 
-            System.out.printf("📊 Übersicht für %s\n", month);
+            System.out.printf("Übersicht für %s\n", month);
             for (OverviewEntry entry : entries) {
                 String status = "";
                 if (entry.hasBudget()) {
                     if (entry.spent().compareTo(entry.budgetAmount().getValue()) > 0) {
-                        status = "⚠️ Überschritten!";
+                        status = "!Überschritten!";
                     } else {
-                        status = "✅ Im Rahmen";
+                        status = "Im Rahmen";
                     }
                 }
                 String icon = entry.hasBudget() && entry.budgetAmount() != null && entry.budgetAmount().getValue().signum() == 0
-                        ? "💰" : "";
+                        ? "€" : "";
                 System.out.printf("- %s%s: %.2f €", entry.categoryName(), icon, entry.spent());
                 if (entry.budgetAmount() != null) {
                     System.out.printf(" / %.2f € Budget (%s)", entry.budgetAmount().getValue(), status);
@@ -55,7 +54,7 @@ public class OverviewCLIHandler {
             }
 
         } catch (Exception e) {
-            System.out.println("❌ Fehler bei der Übersicht.");
+            System.out.println("X Fehler bei der Übersicht.");
             log.error("Fehler beim Abrufen der Monatsübersicht", e);
         }
     }
@@ -67,7 +66,7 @@ public class OverviewCLIHandler {
             try {
                 return YearMonth.parse(input);
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Ungültiges Format. Bitte im Format YYYY-MM eingeben.");
+                System.out.println("X Ungültiges Format. Bitte im Format YYYY-MM eingeben.");
             }
         }
     }

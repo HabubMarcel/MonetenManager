@@ -1,13 +1,13 @@
 package de.marcel.monetenmanager.cli;
 
-import de.marcel.monetenmanager.application.category.CategoryService;
-import de.marcel.monetenmanager.application.user.UserLoginService;
-import de.marcel.monetenmanager.application.user.UserRegistrationService;
 import de.marcel.monetenmanager.cli.budget.BudgetCLIHandler;
 import de.marcel.monetenmanager.cli.category.CategoryCLIHandler;
 import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
 import de.marcel.monetenmanager.cli.user.OverviewCLIHandler;
 import de.marcel.monetenmanager.cli.user.UserCLIHandler;
+import de.marcel.monetenmanager.service.category.CategoryService;
+import de.marcel.monetenmanager.service.user.UserLoginService;
+import de.marcel.monetenmanager.service.user.UserRegistrationService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

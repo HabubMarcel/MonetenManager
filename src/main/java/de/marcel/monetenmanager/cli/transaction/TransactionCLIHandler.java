@@ -8,13 +8,13 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.marcel.monetenmanager.application.category.CategoryService;
-import de.marcel.monetenmanager.application.transaction.TransactionService;
-import de.marcel.monetenmanager.domain.transaction.Transaction;
-import de.marcel.monetenmanager.domain.transaction.TransactionType;
 import de.marcel.monetenmanager.domain.category.Category;
 import de.marcel.monetenmanager.domain.category.CategoryName;
 import de.marcel.monetenmanager.domain.shared.Amount;
+import de.marcel.monetenmanager.domain.transaction.Transaction;
+import de.marcel.monetenmanager.domain.transaction.TransactionType;
+import de.marcel.monetenmanager.service.category.CategoryService;
+import de.marcel.monetenmanager.service.transaction.TransactionService;
 
 
 public class TransactionCLIHandler {
@@ -37,34 +37,34 @@ public class TransactionCLIHandler {
         List<Category> categories = categoryService.getCategoriesForUser(userId);
 
         if (categories.isEmpty()) {
-            System.out.println("⚠️ Du hast noch keine Kategorien erstellt. Bitte zuerst eine anlegen.");
+            System.out.println("! Du hast noch keine Kategorien erstellt. Bitte zuerst eine anlegen.");
             return;
         }
 
-        System.out.println("📂 Verfügbare Kategorien:");
+        System.out.println("Verfügbare Kategorien:");
         for (Category c : categories) {
             System.out.printf("→ %s (%s, %s)\n", c.getName(), c.getType(), c.getColor());
         }
 
-        System.out.println("❗ Bitte gib den Namen einer Kategorie ein.");
-        System.out.println("   Hinweis: Kategorien sollten eindeutige Namen haben!");
+        System.out.println("Bitte gib den Namen einer Kategorie ein.");
+        System.out.println("Hinweis: Kategorien sollten eindeutige Namen haben!");
 
         System.out.print("Kategorie-Name: ");
         String categoryName = scanner.nextLine();
 
         // Kategorie suchen
-        CategoryName inputName = new CategoryName(categoryName);  // Eingabe des Nutzers als Value Object
+        CategoryName inputName = new CategoryName(categoryName);
 
         List<Category> matched = categories.stream()
             .filter(c -> c.getName().equals(inputName))
             .toList();
 
         if (matched.isEmpty()) {
-            System.out.println("❌ Keine Kategorie mit diesem Namen gefunden.");
+            System.out.println("X Keine Kategorie mit diesem Namen gefunden.");
             return;
         }
         if (matched.size() > 1) {
-            System.out.println("⚠️ Mehrere Kategorien mit dem Namen gefunden. Bitte Namen eindeutiger wählen.");
+            System.out.println("! Mehrere Kategorien mit dem Namen gefunden. Bitte Namen eindeutiger wählen.");
             for (Category c : matched) {
                 System.out.printf("→ [%s] %s (%s, %s)\n", c.getId(), c.getName(), c.getType(), c.getColor());
             }
@@ -73,7 +73,7 @@ public class TransactionCLIHandler {
 
         String category = matched.get(0).getName().getValue();
 
-        System.out.print("Betrag (z. B. 50.00): ");
+        System.out.print("Betrag (z.B. 50.00): ");
         BigDecimal amountInput = new BigDecimal(scanner.nextLine());
         Amount amount = new Amount(amountInput);
 
@@ -81,11 +81,11 @@ public class TransactionCLIHandler {
         TransactionType type = TransactionType.valueOf(scanner.nextLine().toUpperCase());
 
         transactionService.createTransaction(userId, category, amount, type);
-        System.out.println("✅ Transaktion gespeichert.");
+        System.out.println("Transaktion gespeichert.");
 
     } catch (Exception e) {
-        log.error("❌ Fehler beim Hinzufügen der Transaktion", e);
-        System.out.println("❌ Transaktion konnte nicht gespeichert werden.");
+        log.error("X Fehler beim Hinzufügen der Transaktion", e);
+        System.out.println("X Transaktion konnte nicht gespeichert werden.");
     }
 }
 
@@ -94,9 +94,9 @@ public class TransactionCLIHandler {
         List<Transaction> transactions = transactionService.getTransactionsForUser(userId);
 
         if (transactions.isEmpty()) {
-            System.out.println("ℹ️ Keine Transaktionen gefunden.");
+            System.out.println("Keine Transaktionen gefunden.");
         } else {
-            System.out.println("📄 Transaktionen:");
+            System.out.println("Transaktionen:");
             for (Transaction t : transactions) {
                 System.out.printf("[%s] %s %.2f € in %s (%s)\n",
                         t.getTimestamp(),

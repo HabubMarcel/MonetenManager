@@ -9,7 +9,7 @@ public class CategoryColor {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException("Farbe darf nicht leer sein.");
         }
-        this.value = value.trim().toLowerCase(); // ggf. validieren gegen erlaubte Farben
+        this.value = value.trim().toLowerCase();
     }
 
     public String getValue() {

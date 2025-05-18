@@ -1,6 +1,5 @@
 package de.marcel.monetenmanager.domain.transaction;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

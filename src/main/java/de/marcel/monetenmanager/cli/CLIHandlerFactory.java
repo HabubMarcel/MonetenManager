@@ -6,8 +6,6 @@ import de.marcel.monetenmanager.cli.transaction.TransactionCLIHandler;
 import de.marcel.monetenmanager.cli.user.OverviewCLIHandler;
 import de.marcel.monetenmanager.cli.user.UserCLIHandler;
 
-import java.util.Scanner;
-
 public class CLIHandlerFactory {
 
     private final UserCLIHandler userHandler;
