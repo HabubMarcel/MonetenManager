@@ -83,8 +83,7 @@ public class UserCLIHandler {
             System.out.print("E-Mail: ");
             String emailInput = scanner.nextLine();
 
-            System.out.print("Passwort: ");
-            String password = scanner.nextLine();
+            String password = promptPassword();
 
             return loginService.login(emailInput, password)
                     .map(user -> {
